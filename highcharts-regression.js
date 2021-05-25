@@ -31,7 +31,7 @@
             var regressionType = s.regressionSettings.type || "linear";
             var regression;
             var extraSerie = s.regressionSettings.regressionSeriesOptions;
-            
+
             // Set default values
             extraSerie.data = [];
             extraSerie.isRegressionLine = true;
@@ -234,11 +234,12 @@
                 data[n][0] = data[n].x;
                 data[n][1] = data[n].y;
             }
+            var idx = _adjustedIndex(data, n);
             if (data[n][1] != null) {
-                sum[0] += data[n][0]; //Σ(X)
+                sum[0] += idx;//data[n][0]; //Σ(X)
                 sum[1] += data[n][1]; //Σ(Y)
-                sum[2] += data[n][0] * data[n][0]; //Σ(X^2)
-                sum[3] += data[n][0] * data[n][1]; //Σ(XY)
+                sum[2] += idx*idx;//data[n][0] * data[n][0]; //Σ(X^2)
+                sum[3] += idx * data[n][1];//data[n][0] * data[n][1]; //Σ(XY)
                 sum[4] += data[n][1] * data[n][1]; //Σ(Y^2)
             } else {
                 N -= 1;
@@ -250,7 +251,7 @@
         // var correlation = (N * sum[3] - sum[0] * sum[1]) / Math.sqrt((N * sum[2] - sum[0] * sum[0]) * (N * sum[4] - sum[1] * sum[1]));
 
         var resultLength = data.length + extrapolate;
-        var step = data[data.length - 1][0] - data[data.length - 2][0];
+        var step = 1.0;//data[data.length - 1][0] - data[data.length - 2][0];
 
         for (var i = 0, len = resultLength; i < len; i++) {
             var answer = 0;
@@ -260,7 +261,7 @@
                 var x = data[data.length - 1][0] + (i - data.length) * step;
             }
 
-            var coorY = x * gradient + intercept;
+            var coorY = _adjustedIndex(data, i) * gradient + intercept;
             if (decimalPlaces)
                 coorY = parseFloat(coorY.toFixed(decimalPlaces));
             var coordinate = [x, coorY];
@@ -277,7 +278,8 @@
             return 0;
         });
 
-        var string = 'y = ' + Math.round(gradient * 100) / 100 + 'x + ' + Math.round(intercept * 100) / 100;
+
+        var string = 'y = ' + Math.round(gradient * 100000) / 100000 + 'x + ' + Math.round(intercept * 100000) / 100000;
         return {equation: [gradient, intercept], points: results, string: string};
     }
 
@@ -353,6 +355,7 @@
             }
         }
 
+
         var B = (n * sum[1] - sum[2] * sum[0]) / (n * sum[3] - sum[0] * sum[0]);
         var A = Math.pow(Math.E, (sum[2] - B * sum[0]) / n);
 
@@ -386,6 +389,13 @@
         return {equation: [A, B], points: results, string: string};
     }
 
+    function _adjustedIndex(data, i) {
+
+        var start = data[0][0];
+        var now = data[i][0];
+        return (now - start) / (86400000 * 30) + 1;
+    }
+
     /**
      * Code extracted from https://github.com/Tom-Alexander/regression-js/
      */
@@ -393,6 +403,7 @@
         if (typeof order == 'undefined') {
             order = 2;
         }
+
         var lhs = [], rhs = [], results = [], a = 0, b = 0, i = 0, k = order + 1;
 
         for (; i < k; i++) {
@@ -402,7 +413,7 @@
                     data[l][1] = data[l].y;
                 }
                 if (data[l][1] != null) {
-                    a += Math.pow(data[l][0], i) * data[l][1];
+                    a += Math.pow(_adjustedIndex(data, l), i) * data[l][1];
                 }
             }
             lhs.push(a);
@@ -411,7 +422,7 @@
             for (var j = 0; j < k; j++) {
                 for (var l = 0, len = data.length; l < len; l++) {
                     if (data[l][1]) {
-                        b += Math.pow(data[l][0], i + j);
+                        b += Math.pow(_adjustedIndex(data, l), i + j);
                     }
                 }
                 c.push(b);
@@ -424,7 +435,7 @@
         var equation = gaussianElimination(rhs, k);
 
         var resultLength = data.length + extrapolate;
-        var step = data[data.length - 1][0] - data[data.length - 2][0];
+        var step = 1.0;//data[data.length - 1][0] - data[data.length - 2][0];
         for (var i = 0, len = resultLength; i < len; i++) {
             var answer = 0;
             var x = 0;
@@ -435,7 +446,7 @@
             }
 
             for (var w = 0; w < equation.length; w++) {
-                answer += equation[w] * Math.pow(x, w);
+                answer += equation[w] * Math.pow(_adjustedIndex(data, i), w);
             }
             results.push([x, answer]);
         }
@@ -452,10 +463,12 @@
 
         var string = 'y = ';
 
+        var mult = 100000;
+
         for (var i = equation.length - 1; i >= 0; i--) {
-            if (i > 1) string += Math.round(equation[i] * 100) / 100 + 'x^' + i + ' + ';
-            else if (i == 1) string += Math.round(equation[i] * 100) / 100 + 'x' + ' + ';
-            else string += Math.round(equation[i] * 100) / 100;
+            if (i > 1) string += Math.round(equation[i] * mult) / mult + 'x^' + i + ' + ';
+            else if (i == 1) string += Math.round(equation[i] * mult) / mult + 'x' + ' + ';
+            else string += Math.round(equation[i] * mult) / mult;
         }
 
         return {equation: equation, points: results, string: string};

@@ -1,10 +1,10 @@
 {
 	"name": "Highcharts regression",
-	"version": "1.0.5",
+	"version": "2.2.1",
 	"title": "Highcharts regression - Linear and non-linear regression for highcharts",
 	"author": {
 		"name": "Ignacio Vazquez",
-		"url": "https://github.com/phpepe/"
+		"url": "https://github.com/kmgill/highcharts-regression"
 	},
 	"licenses": [
 		{
@@ -22,25 +22,20 @@
 		"trendline",
 		"loess fitline"
 	],
-	"homepage": "https://github.com/phpepe/highcharts-regression",	
+	"homepage": "https://github.com/kmgill/highcharts-regression",	
 	"docs": "",	
-	"bugs": "https://github.com/phpepe/highcharts-regression/issues",
-	"download": "https://github.com/phpepe/highcharts-regression/archive/master.zip",
-	"demo": [
-		"http://jsfiddle.net/3g4ryLc9/4/",
-		"http://jsfiddle.net/phpepe/3vruC/",
-		"http://jsfiddle.net/phpepe/sMJv9/",
-		"http://jsfiddle.net/phpepe/72tBr/",
-		"http://jsfiddle.net/3g4ryLc9/",
-		"http://jsfiddle.net/3g4ryLc9/2/",
-		"http://jsfiddle.net/3g4ryLc9/5/"
-		
-	],
+	"bugs": "https://github.com/kmgill/highcharts-regression/issues",
+	"download": "https://github.com/kmgill/highcharts-regression/archive/master.zip",
 	"maintainers": [
 		{
 			"name": "Ignacio Vazquez",
 			"email": "elpepe.uy@gmail.com",
 			"url": "https://github.com/phpepe/"
+		},
+		{
+			"name": "Kevin M. Gill",
+			"email": "apoapsys@gmail.com",
+			"url": "https://github.com/kmgill/"
 		}
 	]	
 }
