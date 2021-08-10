@@ -46,7 +46,8 @@
             if (extraSerie.dashStyle === undefined)     extraSerie.dashStyle = s.regressionSettings.dashStyle || 'solid';
             if (extraSerie.showInLegend === undefined)  extraSerie.showInLegend = !s.regressionSettings.hideInLegend;
             if (extraSerie.tooltip === undefined)       extraSerie.tooltip = s.regressionSettings.tooltip;
-
+            if (extraSerie.animation === undefined)     extraSerie.animation = s.regressionSettings.animation;
+            
             if (s.regressionSettings.tooltip.valueSuffix === undefined) {
                 extraSerie.tooltip.valueSuffix = ' ';
             }
