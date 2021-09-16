@@ -52,6 +52,7 @@
                 extraSerie.tooltip.valueSuffix = ' ';
             }
 
+
             if (typeof s.regressionSettings.index !== 'undefined') {
                 extraSerie.index = s.regressionSettings.index;
             }
@@ -216,6 +217,21 @@
     }
 
 
+    function _mean(data) {
+            // Calc the mean
+            var mean = 0;
+            var N = data.length;
+            for (var i = 0; i < data.length; i++) {
+                if (data[i][1] != null) {
+                    mean += data[i][1];
+                } else {
+                    N--;
+                }
+            }
+            mean /= N;
+            return mean;
+    }
+
     /**
      * Code extracted from https://github.com/Tom-Alexander/regression-js/
      * Human readable formulas:
@@ -228,6 +244,16 @@
      *
      */
     function _linear(data, decimalPlaces, extrapolate) {
+
+        var offset = 0;
+        if (data.deseasoned !== undefined) {
+            y_mean = _mean(data);
+            data = data.deseasoned;
+            t_mean = _mean(data);
+            offset = y_mean - t_mean;
+            console.info(data);
+        }
+
         var sum = [0, 0, 0, 0, 0], n = 0, results = [], N = data.length;
 
         for (; n < data.length; n++) {
@@ -248,7 +274,7 @@
         }
 
         var gradient = (N * sum[3] - sum[0] * sum[1]) / (N * sum[2] - sum[0] * sum[0]);
-        var intercept = (sum[1] / N) - (gradient * sum[0]) / N;
+        var intercept = (sum[1] / N) - (gradient * sum[0]) / N + offset;
         // var correlation = (N * sum[3] - sum[0] * sum[1]) / Math.sqrt((N * sum[2] - sum[0] * sum[0]) * (N * sum[4] - sum[1] * sum[1]));
 
         var resultLength = data.length + extrapolate;
@@ -288,6 +314,17 @@
      *  Code extracted from https://github.com/Tom-Alexander/regression-js/
      */
     function _logarithmic(data, extrapolate) {
+
+        var offset = 0;
+        if (data.deseasoned !== undefined) {
+            y_mean = _mean(data);
+            data = data.deseasoned;
+            t_mean = _mean(data);
+            offset = y_mean - t_mean;
+            console.info(data);
+        }
+
+
         var sum = [0, 0, 0, 0], n = 0, results = [], mean = 0;
 
 
@@ -318,7 +355,7 @@
                 var x = data[data.length - 1][0] + (i - data.length) * step;
             }
 
-            var coordinate = [x, A + B * Math.log(x)];
+            var coordinate = [x, A + B * Math.log(x) + offset];
             results.push(coordinate);
         }
 
@@ -332,7 +369,7 @@
             return 0;
         });
 
-        var string = 'y = ' + Math.round(A * 100) / 100 + ' + ' + Math.round(B * 100) / 100 + ' ln(x)';
+        var string = 'y = ' + Math.round(A * 100) / 100 + ' + ' + Math.round(B * 100) / 100 + ' ln(x)' + " + " + Math.round(offset * 100) / 100 ;
 
         return {equation: [A, B], points: results, string: string};
     }
@@ -341,6 +378,15 @@
      * Code extracted from https://github.com/Tom-Alexander/regression-js/
      */
     function _power(data, extrapolate) {
+        var offset = 0;
+        if (data.deseasoned !== undefined) {
+            y_mean = _mean(data);
+            data = data.deseasoned;
+            t_mean = _mean(data);
+            offset = y_mean - t_mean;
+            console.info(data);
+        }
+
         var sum = [0, 0, 0, 0], n = 0, results = [];
 
         for (len = data.length; n < len; n++) {
@@ -371,7 +417,7 @@
                 var x = data[data.length - 1][0] + (i - data.length) * step;
             }
 
-            var coordinate = [x, A * Math.pow(x, B)];
+            var coordinate = [x, A * Math.pow(x, B) + offset];
             results.push(coordinate);
         }
 
@@ -385,7 +431,7 @@
             return 0;
         });
 
-        var string = 'y = ' + Math.round(A * 100) / 100 + 'x^' + Math.round(B * 100) / 100;
+        var string = 'y = ' + Math.round(A * 100) / 100 + 'x^' + Math.round(B * 100) / 100 + " + " + Math.round(offset * 100) / 100 ;
 
         return {equation: [A, B], points: results, string: string};
     }
@@ -401,6 +447,17 @@
      * Code extracted from https://github.com/Tom-Alexander/regression-js/
      */
     function _polynomial(data, order, extrapolate) {
+
+        var offset = 0;
+        if (data.deseasoned !== undefined) {
+            y_mean = _mean(data);
+            data = data.deseasoned;
+            t_mean = _mean(data);
+            offset = y_mean - t_mean;
+            console.info(data);
+        }
+
+
         if (typeof order == 'undefined') {
             order = 2;
         }
@@ -449,7 +506,7 @@
             for (var w = 0; w < equation.length; w++) {
                 answer += equation[w] * Math.pow(_adjustedIndex(data, i), w);
             }
-            results.push([x, answer]);
+            results.push([x, answer + offset]);
         }
 
         results.sort(function (a, b) {
@@ -469,7 +526,7 @@
         for (var i = equation.length - 1; i >= 0; i--) {
             if (i > 1) string += Math.round(equation[i] * mult) / mult + 'x^' + i + ' + ';
             else if (i == 1) string += Math.round(equation[i] * mult) / mult + 'x' + ' + ';
-            else string += Math.round(equation[i] * mult) / mult;
+            else string += (Math.round((equation[i] + offset) * mult ) / mult);
         }
 
         return {equation: equation, points: results, string: string};
@@ -482,6 +539,16 @@
      * - https://gist.github.com/avibryant/1151823
      */
     function _loess(data, bandwidth) {
+        var offset = 0;
+        if (data.deseasoned !== undefined) {
+            y_mean = _mean(data);
+            data = data.deseasoned;
+            t_mean = _mean(data);
+            offset = y_mean - t_mean;
+            console.info(data);
+        }
+
+
         bandwidth = bandwidth || 0.25;
 
         var xval = data.map(function (pair) {
@@ -573,7 +640,7 @@
         return {
             equation: "",
             points: xval.map(function (x, i) {
-                return [x, res[i]];
+                return [x, res[i] + offset];
             }),
             string: ""
         };
