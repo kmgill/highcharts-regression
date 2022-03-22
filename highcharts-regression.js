@@ -309,7 +309,7 @@
         var g_magnitude = Math.pow(10, Math.floor(Math.abs(Math.log10(Math.abs(gradient))))+3);
         var i_magnitude = Math.pow(10, Math.floor(Math.abs(Math.log10(Math.abs(intercept))))+3);
         //console.info([gradient, intercept, g_magnitude, i_magnitude]);
-        var string = 'y = ' + Math.round(gradient * g_magnitude) / g_magnitude + 't + ' + Math.round(intercept * i_magnitude) / i_magnitude;
+        var string = 'y(t) = ' + Math.round(gradient * g_magnitude) / g_magnitude + ' t + ' + Math.round(intercept * i_magnitude) / i_magnitude;
         return {equation: [gradient, intercept], points: results, string: string};
     }
 
@@ -522,12 +522,12 @@
             return 0;
         });
 
-        var string = 'y = ';
+        var string = 'y(t) = ';
 
         for (var i = equation.length - 1; i >= 0; i--) {
             var magnitude = Math.pow(10, Math.floor(Math.abs(Math.log10(Math.abs(equation[i]))))+3);
-            if (i > 1) string += Math.round(equation[i] * magnitude) / magnitude + 'x^' + i + ' + ';
-            else if (i == 1) string += Math.round(equation[i] * magnitude) / magnitude + 'x' + ' + ';
+            if (i > 1) string += Math.round(equation[i] * magnitude) / magnitude + 't^' + i + ' + ';
+            else if (i == 1) string += Math.round(equation[i] * magnitude) / magnitude + 't' + ' + ';
             else string += (Math.round((equation[i] + offset) * magnitude ) / magnitude);
         }
 
