@@ -309,7 +309,7 @@
         var g_magnitude = Math.pow(10, Math.floor(Math.abs(Math.log10(Math.abs(gradient))))+3);
         var i_magnitude = Math.pow(10, Math.floor(Math.abs(Math.log10(Math.abs(intercept))))+3);
         //console.info([gradient, intercept, g_magnitude, i_magnitude]);
-        var string = 'y(t) = ' + Math.round(gradient * g_magnitude) / g_magnitude + ' t + ' + Math.round(intercept * i_magnitude) / i_magnitude;
+        var string = 'y(t) = ' + Math.round(gradient * g_magnitude) / g_magnitude + ' t + ' + Math.round(intercept * i_magnitude) / i_magnitude + ", time (t): month";
         return {equation: [gradient, intercept], points: results, string: string};
     }
 
@@ -530,6 +530,7 @@
             else if (i == 1) string += Math.round(equation[i] * magnitude) / magnitude + 't' + ' + ';
             else string += (Math.round((equation[i] + offset) * magnitude ) / magnitude);
         }
+        string += ", time (t): month";
 
         return {equation: equation, points: results, string: string};
     }
